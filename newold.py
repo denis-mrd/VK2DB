@@ -2,8 +2,8 @@ __author__ = 'mrD'
 # -*- coding: utf8 -*-
 
 import vk, pypyodbc
-session = vk.Session(access_token='c901efb5f69c8d0ff58d0ea86c5139bf2596435b31640cb6e9b2598192ebbddc1e0c864f5aed834f9480d')
-#session = vk.AuthSession(app_id='5129430 ', user_login='89667613408', user_password='boat123')
+session = vk.Session(access_token='')
+
 api = vk.API(session, v='5.37', lang='ru', timeout=10)
 #api.method.name(param=value)
 #print(api.users.get(user_ids=58786921))
