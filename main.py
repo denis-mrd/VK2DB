@@ -1,18 +1,30 @@
 # -*- coding: utf8 -*-
 __author__ = 'mrD'
 
-import vk, VKtoken, postgresql,  time
+import vk, VKtoken, postgresql, time
 session = vk.Session(access_token=VKtoken.access_token)
 api = vk.API(session, v='5.74', lang='ru', timeout=10)
 db = postgresql.open('pq://postgres:postgres@localhost:5432/vk')
-ins = db.prepare("INSERT INTO users (userid, name, surname) VALUES ($1, $2, $3)")
 
-userid = 52486985
-user = api.users.get(user_id = userid)
-friends = api.friends.get(user_id = userid)
-vkuser = api.users.get(user_ids = userid, fields = 'photo_id, deactivated, verified, sex, bdate, city, country, home_town, has_photo, photo_max_orig, online, online_mobile, domain, has_mobile, contacts, site, education, universities, schools, status, last_seen, followers_count, common_count, occupation, nickname, relatives, relation, personal, connections, exports, wall_comments, activities, interests, music, movies, tv, books, games, about, quotes, can_post, can_see_all_posts, can_see_audio, can_write_private_message, can_send_friend_request, is_favorite, is_hidden_from_feed, hidden, timezone, screen_name, maiden_name, is_friend, friend_status, career, military, blacklisted, blacklisted_by_me, counters')
+userid = int(input('Ведите id пользователя Вконтакте: '))
+info = 'id, domain, nickname, screen_name, first_name, last_name, maiden_name, sex, bdate'#, city, home_town, country, contacts, photo_max_orig, connections, exports, site, last_seen, deactivated, hidden, career, education, military, occupation, relatives, relation, schools, status, personal, activities, interests, music, movies, tv, books, games, quotes, about'
+friends = api.friends.get(user_id=userid)
+vkuser = api.users.get(user_ids=userid, fields=info)
+friends_all = friends['count']
+friends_counter = 0
+print('Пользователь %s %s имеет %s друзей' % (vkuser[0]['first_name'], vkuser[0]['last_name'], friends_all))
 
-print('user %1 ', user[0]['first_name'], user[0]['last_name'], friends['count'])
+for x in friends['items']: #для каждого ИДшника из списка друзей
+    user = api.users.get(user_ids=x, fields=info)
+    friends_counter += 1
+    print('Обрабатывается: ', user[0]['first_name'], user[0]['last_name'], str(friends_counter) + '/' + str(friends_all))
+    ins_id = "INSERT INTO public.friends (id) VALUES ('" + str(user[0]['id']) + "');"
+    db.query(ins_id)
 
+    for key in user[0]: #создаем запрос
+        upd_val = "UPDATE public.friends SET " + str(key) + " = '" + str(user[0][key]) + "' where id = " + str(user[0]['id'])
+        db.query(upd_val)
 
-#ins(userid, "afiskon", "123")
+    time.sleep(1)
+
+print('Все друзья успешно загружены в базу данных!')
