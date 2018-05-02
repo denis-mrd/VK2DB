@@ -7,7 +7,7 @@ api = vk.API(session, v='5.74', lang='ru', timeout=10)
 db = postgresql.open('pq://postgres:postgres@localhost:5432/vk')
 
 userid = int(input('Ведите id пользователя Вконтакте: '))
-info = 'id, domain, nickname, screen_name, first_name, last_name, maiden_name, sex, bdate'#, city, home_town, country, contacts, photo_max_orig, connections, exports, site, last_seen, deactivated, hidden, career, education, military, occupation, relatives, relation, schools, status, personal, activities, interests, music, movies, tv, books, games, quotes, about'
+info = 'id, domain, nickname, screen_name, first_name, last_name, maiden_name, sex, bdate, city, home_town, country, contacts, photo_max_orig, connections, exports, site, deactivated, hidden, occupation, relation, status, activities, interests, music, movies, tv, books, games, quotes, about'
 friends = api.friends.get(user_id=userid)
 vkuser = api.users.get(user_ids=userid, fields=info)
 friends_all = friends['count']
@@ -22,9 +22,24 @@ for x in friends['items']: #для каждого ИДшника из списк
     db.query(ins_id)
 
     for key in user[0]: #создаем запрос
-        upd_val = "UPDATE public.friends SET " + str(key) + " = '" + str(user[0][key]) + "' where id = " + str(user[0]['id'])
-        db.query(upd_val)
+        val = str(user[0][key])
+        try:
+            if key == 'city':
+                val = str(user[0][key]['title'])
+            elif key == 'country':
+                val = str(user[0][key]['title'])
+            elif key == 'occupation':
+                val = str(user[0][key]['name'])
+            elif key == 'relation_partner':
+                val = str(user[0][key]['first_name']) + ' ' + str(user[0][key]['last_name'])
 
+            upd_val = "UPDATE public.friends SET " + str(key) + " = '" + val + "' where id = " + str(user[0]['id'])
+            db.query(upd_val)
+
+        except postgresql.exceptions.UndefinedColumnError as err:
+            print('UndefinedColumnError')
+        except postgresql.exceptions.SyntaxError as err:
+            print('SyntaxError')
     time.sleep(1)
 
 print('Все друзья успешно загружены в базу данных!')

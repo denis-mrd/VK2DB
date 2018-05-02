@@ -26,11 +26,10 @@ def update (column = None, value = None, id = None):
     #     except IndexError as err:
     #         print (err)
     if type(value) is dict:
-        d = value
-        for key in d:
+        for key in value:
             newcolumn = ''
             newcolumn = column + '_' + key
-            value = d.get(key)
+            value = value.get(key)
 
             update(newcolumn, value, id)
 
