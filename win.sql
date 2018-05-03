@@ -4,9 +4,9 @@ group by city
 order by quantity desc;
 
 
-select YEAR(try_convert(date, bdate, 104)) as year, count(*)  as quantity 
+select YEAR(convert(date, bdate, 104)) as year, count(*)  as quantity
 from friends 
-group by YEAR(try_convert(date, bdate, 104)) 
+group by YEAR(convert(date, bdate, 104))
 order by quantity desc;
 
 SELECT
