@@ -1,17 +1,20 @@
-select city_title, count(*)  as quantity 
-from friends 
-group by city_title 
-order by quantity desc
+select city, count(*)  as quantity
+from friends
+group by city
+order by quantity desc;
 
 
 select YEAR(try_convert(date, bdate, 104)) as year, count(*)  as quantity 
 from friends 
 group by YEAR(try_convert(date, bdate, 104)) 
-order by quantity desc
+order by quantity desc;
 
-select sex, count(*) as quantity 
-from friends 
+SELECT
+	count(*) as quantity,
+    CASE WHEN sex=1 THEN 'Женский пол'
+         WHEN sex=2 THEN 'Мужской пол'
+         ELSE 'Пол не указан'
+		END
+    FROM friends
 group by sex
-order by quantity desc
-
---select * from friends
+order by quantity desc;
